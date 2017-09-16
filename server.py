@@ -42,8 +42,27 @@ def readBoard(boardName):
 
 # readBoard takes a 10 x 10 matrix representing a board
 #   and writes it to the given file
-def writeBoard(boardName, file):
-    return "show bob and vagene"
+def writeBoard(boardName):
+    # check arguments & assign proper file/matrix to use
+    f = ""
+    b = None
+    if boardName == "own":
+        f = ownFile
+        b = ownBoard
+    elif boardName == "opp":
+        f = oppFile
+        b = oppBoard
+    else:
+        raise ValueError("Expected \"own\" or \"opp\" as arg. Got " + board)
+
+    # open the file and populate the board
+    with open(f, 'w') as boardFile:
+        for x in range(len(b)):
+            # go through each character in the line and populate the board
+            for y in range(len(b[x])):
+                # i is the ROW number, j is the COLUMN number
+                boardFile.write(str(b[x][y]))
+            boardFile.write("\n")
 
 # printBoard takes in the board to print and prints it
 def printBoard(board):
@@ -65,6 +84,7 @@ def main():
     # read in the player's board
     readBoard("own")
     printBoard(ownBoard)
+    writeBoard("own")
 
     print("Server functionality not supported")
 
