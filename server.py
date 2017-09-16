@@ -1,8 +1,12 @@
+import sys
+
+port = None
+
 # setup 10 x 10 matrices for player board and opponent board (Python is stupid)
 ownBoard = [[""] * 10 for i in range(10)]
 oppBoard = [[""] * 10 for i in range(10)]
 
-ownFile = "board.txt"
+ownFile = ""
 oppFile = "opp-board.txt"
 
 # checkFire takes in a set of coordinates (target of an opponent's shot)
@@ -13,14 +17,14 @@ def checkFire(x, y):
 
 # readBoard takes a file representing a board
 #   and reads it into the given 10 x 10 matrix
-def readBoard(board):
+def readBoard(boardName):
     # check arguments & assign proper file/matrix to use
     f = ""
     b = None
-    if board == "own":
+    if boardName == "own":
         f = ownFile
         b = ownBoard
-    elif board == "opp":
+    elif boardName == "opp":
         f = oppFile
         b = oppBoard
     else:
@@ -34,14 +38,34 @@ def readBoard(board):
             for y in range(10):
                 # i is the ROW number, j is the COLUMN number
                 b[x][y] = line[y]
-
+            x += 1
 
 # readBoard takes a 10 x 10 matrix representing a board
 #   and writes it to the given file
-def writeBoard(board, file):
+def writeBoard(boardName, file):
     return "show bob and vagene"
 
+# printBoard takes in the board to print and prints it
+def printBoard(board):
+    for x in range(len(board)):
+        for y in range(len(board[x])):
+            print(board[x][y], end="")
+        print()
+
 def main():
+    global port
+    global ownFile
+    if len(sys.argv) != 3:
+        print("ERROR: You must provide the port and the board file to stand up a server.")
+
+    # read in the args from the command line
+    port = sys.argv[1]
+    ownFile = sys.argv[2]
+
+    # read in the player's board
+    readBoard("own")
+    printBoard(ownBoard)
+
     print("Server functionality not supported")
 
 if __name__ == '__main__':
