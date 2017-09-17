@@ -14,10 +14,6 @@ oppFile = "opp-board.txt" # default opposing file name
 
 # BattleshipRequestHandler is an extension of BaseHTTPRequestHandler
 class BattleshipRequestHandler(BaseHTTPRequestHandler):
-    # handles player's requests to view a board
-    def do_GET(self):
-        print("define me!")
-
     # handles opponent fire requests and player result requests
     def do_POST(self):
         # determine the request's length and extract the content
@@ -30,6 +26,16 @@ class BattleshipRequestHandler(BaseHTTPRequestHandler):
 
         # determine what kind of request it is,
         #   fire (len = 2) or result (len > 2)
+        if len(pathdict) == 2:
+            resppathlist = checkFire(pathdict["x"], pathdict["y"])
+            # package up and send the response
+        elif len(pathdict) > 2:
+            logResult(pathdict["x"], pathdict["y"], pathdict["hit"], pathdict["sink"])
+        else:
+            # do not raise exception,
+            #   as an incorrect error path is expected behavior
+            print("ERROR: Invalid URL path recieved: " + pathdict.items())
+
 
 # takes in a URL path (var1=int_val&var2=int_val...)
 #   and breaks up the entries into key:value pairings
@@ -55,7 +61,8 @@ def checkFire(x, y):
 
 # logResult takes a set of coords (location of player's shot)
 #   and logs the result of that shot as described by the other server
-def logResult(x, y, res):
+def logResult(x, y, hit, sink):
+
     return "must log hit, miss, sink"
 
 # readBoard takes a file representing a board
@@ -71,7 +78,7 @@ def readBoard(boardName):
         f = oppFile
         b = oppBoard
     else:
-        raise ValueError("Expected \"own\" or \"opp\" as arg. Got " + board)
+        raise Exception("Expected \"own\" or \"opp\" as arg. Got " + board)
 
     # TODO check if file exists. If not, error (own) or initialize file (opp)
 
@@ -108,6 +115,13 @@ def writeBoard(boardName):
                 # i is the ROW number, j is the COLUMN number
                 boardFile.write(str(b[x][y]))
             boardFile.write("\n")
+
+    # additionally, write the board to the HTML file
+    writeBoardToHTML(b, f)
+
+# writeBoardToHTML writes the given board
+def writeBoardToHTML(board, txtfilename):
+    raise Exception("Don't use me. I don't do anything yet.")
 
 # printBoard takes in the board to print and prints it
 def printBoard(board):
