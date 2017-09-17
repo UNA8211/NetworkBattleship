@@ -24,17 +24,13 @@ def main():
 def fire(ip, port, coords):
     parameters = {"x" : coords[0:1], "y" : coords[-1:]}
 
-    r = requests.get("http://" + ip + ":" + port, timeout=30)
+    r = requests.post("http://" + ip + ":" + port, data=parameters, timeout=30)
     r.status_code
 
-    #conn = http.client.HTTPConnection(ip, port)
-    #conn.request("POST", parameters)
-    #res = conn.getresponse()
-    
-
     def update(response):
-        conn = http.client.HTTPConnection("localhost", 5000)
-        conn.request("POST", response.body)
+        #TODO: add the response as data to send to own server
+        r = requests.post("http://localhost:5000", timeout=30)
+        r.status_code
     
 IP_PATTERN = "\d{3}\.\d{3}\.\d(\d{1,2})?\.\d(\d{1,2})?"
 PORT_PATTERN = "^\d{1,4}"
