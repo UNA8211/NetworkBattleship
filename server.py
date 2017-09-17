@@ -14,9 +14,6 @@ oppFile = "opp-board.txt" # default opposing file name
 
 # BattleshipRequestHandler is an extension of BaseHTTPRequestHandler
 class BattleshipRequestHandler(BaseHTTPRequestHandler):
-    def do_GET(self):
-        self.send_response(200)
-
     # handles opponent fire requests and player result requests
     def do_POST(self):
         print("got POST")
