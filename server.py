@@ -1,5 +1,6 @@
 from collections import defaultdict
 from http.server import BaseHTTPRequestHandler, HTTPServer
+from re import sub
 from urllib.parse import urlparse
 import sys
 
@@ -8,6 +9,9 @@ port = None
 # setup 10 x 10 matrices for player board and opponent board
 ownBoard = [[""] * 10 for i in range(10)]
 oppBoard = [["_"] * 10 for i in range(10)] # initialize coords with water
+
+# tracking remaining hits on each ship
+shipStatus = defaultdict(int)
 
 ownFile = ""
 oppFile = "opp-board.txt" # default opposing file name
@@ -21,20 +25,24 @@ class BattleshipRequestHandler(BaseHTTPRequestHandler):
         content = self.rfile.read(contentLen)
 
         # parse the URL for the path and put the values in a map
-        path = str(urlparse(content).path)
+        path = sub("'","",str(urlparse(content).path))
         pathdict = parsePath(path)
 
         # determine what kind of request it is,
         #   fire (len = 2) or result (len > 2)
         if len(pathdict) == 2:
-            resppathlist = checkFire(pathdict["x"], pathdict["y"])
+            respdict = handleFire(pathdict["x"], pathdict["y"])
+
             # package up and send the response
+            self.send_response(respdict["status_code"])
         elif len(pathdict) > 2:
-            logResult(pathdict["x"], pathdict["y"], pathdict["hit"], pathdict["sink"])
+            self.send_response(200)
+            handleResult(pathdict["x"], pathdict["y"], pathdict["hit"], pathdict["sink"])
         else:
             # do not raise exception,
-            #   as an incorrect error path is expected behavior
+            #   as an invalid fire command is expected behavior
             print("ERROR: Invalid URL path recieved: " + pathdict.items())
+            self.send_response(400)
 
 
 # takes in a URL path (var1=int_val&var2=int_val...)
@@ -55,13 +63,44 @@ def parsePath(path):
 
 # checkFire takes in a set of coordinates (target of an opponent's shot)
 #   and assesses the result of the shot. This result is written to the Message.
-def checkFire(x, y):
-    # message process needs to be defined before this can be developed
-    return "Hopefully it didn't do damage"
+def handleFire(x, y):
+    # keep track of the response information to return
+    respdict = defaultdict(int)
+    respdict["x"] = x
+    respdict["y"] = y
+
+    global ownBoard
+    global shipStatus
+
+    # 404 if the coordinates cannot be found
+    if (x >= len(ownBoard) | x < 0) | (y >= len(ownBoard[x]) | y < 0):
+        respdict["status_code"] = 404 # Not Found
+        return respdict
+
+    respdict["status_code"] = 200 # Ok
+
+    # check if the square has been fired at already
+    if ownBoard[x][y] == "X":
+        respdict["status_code"] = 410 # Gone
+    # if a ship has been hit
+    elif ownBoard[x][y] != "_":
+        # log a hit on whatever ship was hit
+        respdict["hit"] = 1
+        shipStatus[ownBoard[x][y]] -= 1
+
+        # check if the ship has been sunk
+        if shipStatus[ownBoard[x][y]] == 0:
+            respdict["sink"] = 1
+
+    # mark the position as having been fired at
+    ownBoard[x][y] = "X"
+
+    # return what will be the contents of the response message
+    return respdict
 
 # logResult takes a set of coords (location of player's shot)
 #   and logs the result of that shot as described by the other server
-def logResult(x, y, hit, sink):
+def handleResult(x, y, hit, sink):
 
     return "must log hit, miss, sink"
 
@@ -157,8 +196,7 @@ def main():
 
     # read in the player's board
     readBoard("own")
-    # printBoard(ownBoard)
-    writeBoard("own")
+    #writeBoard("own")
 
     # TODO read in the opponent's board (if a game is being resumed)
 
