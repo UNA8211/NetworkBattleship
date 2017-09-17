@@ -128,13 +128,19 @@ def writeBoard(boardName):
 
 # writeBoardToHTML writes the given board
 def writeBoardToHTML(board, txtfilename):
-    html = open(txtfilename, 'w')
-    html.write("<html> <head> </head> <body> <p>")
-    for x in range(len(board)):
-        for y in range(len(board[x])):
-            html.write(board[x][y])
-        html.write("<br/>")
-    html.write("</p> </body> </html>")
+    # Save a local version of the current sysout
+    stdout = sys.stdout
+
+    # Redirect sysout
+    sys.stdout = open(txtfilename, 'w')
+
+    # Print board to HTML
+    print("<html> <head> </head> <body> <pre>")
+    printBoard(board)
+    print("</pre> </body> </html>")
+
+    # Reset sysout to original
+    sys.stdout = stdout
     
 # printBoard takes in the board to print and prints it
 def printBoard(board):
