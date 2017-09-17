@@ -15,7 +15,7 @@ oppFile = "opp-board.txt" # default opposing file name
 # BattleshipRequestHandler is an extension of BaseHTTPRequestHandler
 class BattleshipRequestHandler(BaseHTTPRequestHandler):
     def do_GET(self):
-        self.wfile.write("got".encode("utf-8"))
+        self.send_response(200)
 
     # handles opponent fire requests and player result requests
     def do_POST(self):
@@ -52,7 +52,6 @@ def parsePath(path):
     # find each of the fields in the URL path
     pathArr = path.split("&")
     for fvpair in pathArr:
-        print(fvpair)
         # separate the field and its respective value,
         #   and add the pair to the dict
         fvArr = fvpair.split("=")
