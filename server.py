@@ -1,24 +1,46 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
+from urllib.parse import urlparse
 import sys
 
 port = None
 
-# setup 10 x 10 matrices for player board and opponent board (Python is stupid)
+# setup 10 x 10 matrices for player board and opponent board
 ownBoard = [[""] * 10 for i in range(10)]
-oppBoard = [[""] * 10 for i in range(10)]
+oppBoard = [["_"] * 10 for i in range(10)] # initialize coords with water
 
 ownFile = ""
-oppFile = "opp-board.txt"
+oppFile = "opp-board.txt" # default opposing file name
 
-class BattleshipServer(BaseHTTPRequestHandler):
+# BattleshipRequestHandler is an extension of BaseHTTPRequestHandler
+class BattleshipRequestHandler(BaseHTTPRequestHandler):
+    # handles player's requests to view a board
+    def do_GET(self):
+        print("define me!")
+
+    # handles opponent fire requests and player result requests
     def do_POST(self):
-        messageLen = int(self.headers.getheader('content-length', 0))
+        # determine the request's length and extract the content
+        contentLen = int(self.headers.get('content-length', 0))
+        content = self.rfile.read(contentLen)
+
+        # parse the URL for the path and put the values in a map
+        path = urlparse(content).path
+        pathmap = parsePath(path)
+
+# takes in a URL path (var1=int_val&var2=int_val...)
+#   and breaks up the entries into key:value pairings
+def parsePath(path):
 
 # checkFire takes in a set of coordinates (target of an opponent's shot)
 #   and assesses the result of the shot. This result is written to the Message.
 def checkFire(x, y):
     # message process needs to be defined before this can be developed
     return "Hopefully it didn't do damage"
+
+# logResult takes a set of coords (location of player's shot)
+#   and logs the result of that shot as described by the other server
+def logResult(x, y, res):
+    return "must log hit, miss, sink"
 
 # readBoard takes a file representing a board
 #   and reads it into the given 10 x 10 matrix
@@ -35,13 +57,15 @@ def readBoard(boardName):
     else:
         raise ValueError("Expected \"own\" or \"opp\" as arg. Got " + board)
 
+    # TODO check if file exists. If not, error (own) or initialize file (opp)
+
+
     # open the file and populate the board
     with open(f, 'r') as boardFile:
         x = 0
         for line in boardFile:
             # go through each character in the line and populate the board
             for y in range(10):
-                # i is the ROW number, j is the COLUMN number
                 b[x][y] = line[y]
             x += 1
 
@@ -77,7 +101,7 @@ def printBoard(board):
         print()
 
 # run sets up the desired server and runs it
-def run(server_class=HTTPServer, handler_class=BattleshipServer):
+def run(server_class=HTTPServer, handler_class=BattleshipRequestHandler):
     server_address = ('', port)
     httpd = server_class(server_address, handler_class)
     httpd.serve_forever()
@@ -97,6 +121,9 @@ def main():
     readBoard("own")
     printBoard(ownBoard)
     writeBoard("own")
+
+    # TODO read in the opponent's board (if a game is being resumed)
+
 
     print("Server functionality not supported")
     # run()
