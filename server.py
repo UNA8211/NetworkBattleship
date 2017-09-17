@@ -133,8 +133,16 @@ def printBoard(board):
 # run sets up the desired server and runs it
 def run(server_class=HTTPServer, handler_class=BattleshipRequestHandler):
     server_address = ('', port)
-    httpd = server_class(server_address, handler_class)
-    httpd.serve_forever()
+    server = server_class(server_address, handler_class)
+    print("Standing up Battleship server...")
+
+    try:
+    	server.serve_forever()
+    except KeyboardInterrupt:
+    	pass
+
+    server.server_close()
+    print("Shutting down Battleship server...")
 
 def main():
     global port
@@ -149,13 +157,11 @@ def main():
 
     # read in the player's board
     readBoard("own")
-    printBoard(ownBoard)
+    # printBoard(ownBoard)
     writeBoard("own")
 
     # TODO read in the opponent's board (if a game is being resumed)
 
-
-    print("Server functionality not supported")
     run()
 
 if __name__ == '__main__':
