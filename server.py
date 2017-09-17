@@ -117,7 +117,7 @@ def writeBoard(boardName):
             boardFile.write("\n")
 
     # additionally, write the board to the HTML file
-    writeBoardToHTML(b, f)
+    #writeBoardToHTML(b, f)
 
 # writeBoardToHTML writes the given board
 def writeBoardToHTML(board, txtfilename):
@@ -144,7 +144,7 @@ def main():
         return 1
 
     # read in the args from the command line
-    port = sys.argv[1]
+    port = int(sys.argv[1])
     ownFile = sys.argv[2]
 
     # read in the player's board
@@ -156,7 +156,7 @@ def main():
 
 
     print("Server functionality not supported")
-    # run()
+    run()
 
 if __name__ == '__main__':
     main()
