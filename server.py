@@ -15,7 +15,7 @@ oppFile = "opp-board.txt" # default opposing file name
 # BattleshipRequestHandler is an extension of BaseHTTPRequestHandler
 class BattleshipRequestHandler(BaseHTTPRequestHandler):
     def do_GET(self):
-        self.send_response(200)
+        self.wfile.write("got".encode("utf-8"))
 
     # handles opponent fire requests and player result requests
     def do_POST(self):
@@ -52,6 +52,7 @@ def parsePath(path):
     # find each of the fields in the URL path
     pathArr = path.split("&")
     for fvpair in pathArr:
+        print(fvpair)
         # separate the field and its respective value,
         #   and add the pair to the dict
         fvArr = fvpair.split("=")
@@ -127,8 +128,14 @@ def writeBoard(boardName):
 
 # writeBoardToHTML writes the given board
 def writeBoardToHTML(board, txtfilename):
-    raise Exception("Don't use me. I don't do anything yet.")
-
+    html = open(txtfilename, 'w')
+    html.write("<html> <head> </head> <body> <p>")
+    for x in range(len(board)):
+        for y in range(len(board[x])):
+            html.write(board[x][y])
+        html.write("<br/>")
+    html.write("</p> </body> </html>")
+    
 # printBoard takes in the board to print and prints it
 def printBoard(board):
     for x in range(len(board)):
