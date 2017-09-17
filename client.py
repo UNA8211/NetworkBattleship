@@ -1,6 +1,5 @@
 #!/usr/bin/python
-import sys
-import re
+import sys, re, http.client, urllib.parse
 
 def main():
     args = sys.argv[1:]
@@ -24,6 +23,21 @@ def main():
         print ("ERROR: Invalid Coordinates")
         return 1
 
+    fire(ip.group(), port.group(), coords.group())
+
+def fire(ip, port, coords):
+    parameters = urllib.parse.urlencode({"x" : coords[0:1], "y" : coords[-1:]})
+    # For testing
+    print (parameters)
+
+    #This may not be quite correct
+    conn = http.client.HTTPConnection(ip, port)
+    conn.request("POST", parameters)
+
+    res = conn.getresponse()
+    # For Testing
+    print (res.status, res.reason)
+    
 IP_PATTERN = "\d{3}\.\d{3}\.\d(\d{1,2})?\.\d(\d{1,2})?"
 PORT_PATTERN = "^\d{1,4}"
 COORDINATE_PATTERN = "\d \d"
