@@ -1,3 +1,4 @@
+from collections import defaultdict
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from urllib.parse import urlparse
 import sys
@@ -25,11 +26,26 @@ class BattleshipRequestHandler(BaseHTTPRequestHandler):
 
         # parse the URL for the path and put the values in a map
         path = urlparse(content).path
-        pathmap = parsePath(path)
+        pathdict = parsePath(path)
+
+        # determine what kind of request it is,
+        #   fire (len = 2) or result (len > 2)
 
 # takes in a URL path (var1=int_val&var2=int_val...)
 #   and breaks up the entries into key:value pairings
 def parsePath(path):
+    # where the path info will be stored and returned
+    pathdict = defaultdict(int)
+
+    # find each of the fields in the URL path
+    pathArr = path.split("&")
+    for fvpair in pathArr:
+        # separate the field and its respective value,
+        #   and add the pair to the dict
+        fvArr = fvpair.split("=")
+        pathdict[fvArr[0]] = int(fvArr[1])
+
+    return pathdict
 
 # checkFire takes in a set of coordinates (target of an opponent's shot)
 #   and assesses the result of the shot. This result is written to the Message.
