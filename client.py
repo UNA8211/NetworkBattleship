@@ -14,12 +14,8 @@ def main():
         print ("ERROR: Invalid port")
         return 1
 
-    coords = re.match(COORDINATE_PATTERN, args[2] + " " + args[3], flags=0)
-    print (coords.group())
-    if coords is None:
-        print ("ERROR: Invalid Coordinates")
-        return 1
-    fire(ip, port.group(), coords.group())
+    coords = args[2] + " " + args[3]
+    fire(ip, port.group(), coords)
 
 def fire(ip, port, coords):
     parameters = {"x" : coords[0:1], "y" : coords[-1:]}
