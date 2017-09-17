@@ -1,3 +1,4 @@
+from http.server import BaseHTTPRequestHandler, HTTPServer
 import sys
 
 port = None
@@ -8,6 +9,10 @@ oppBoard = [[""] * 10 for i in range(10)]
 
 ownFile = ""
 oppFile = "opp-board.txt"
+
+class BattleshipServer(BaseHTTPRequestHandler):
+    def do_POST(self):
+        messageLen = int(self.headers.getheader('content-length', 0))
 
 # checkFire takes in a set of coordinates (target of an opponent's shot)
 #   and assesses the result of the shot. This result is written to the Message.
@@ -71,11 +76,18 @@ def printBoard(board):
             print(board[x][y], end="")
         print()
 
+# run sets up the desired server and runs it
+def run(server_class=HTTPServer, handler_class=BattleshipServer):
+    server_address = ('', port)
+    httpd = server_class(server_address, handler_class)
+    httpd.serve_forever()
+
 def main():
     global port
     global ownFile
     if len(sys.argv) != 3:
         print("ERROR: You must provide the port and the board file to stand up a server.")
+        return 1
 
     # read in the args from the command line
     port = sys.argv[1]
@@ -87,6 +99,7 @@ def main():
     writeBoard("own")
 
     print("Server functionality not supported")
+    # run()
 
 if __name__ == '__main__':
     main()
