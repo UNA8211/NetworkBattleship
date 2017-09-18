@@ -73,7 +73,7 @@ def handleFire(x, y):
     global shipStatus
 
     # 404 if the coordinates cannot be found
-    if (x >= len(ownBoard) | x < 0) | (y >= len(ownBoard[x]) | y < 0):
+    if x < 0 or x >= len(ownBoard) or y < 0 or y >= len(ownBoard[x]):
         respdict["status_code"] = 404 # Not Found
         return respdict
 
@@ -94,6 +94,7 @@ def handleFire(x, y):
 
     # mark the position as having been fired at
     ownBoard[x][y] = "X"
+    #writeBoard("own")
 
     # return what will be the contents of the response message
     return respdict
@@ -196,7 +197,6 @@ def main():
 
     # read in the player's board
     readBoard("own")
-    #writeBoard("own")
 
     # TODO read in the opponent's board (if a game is being resumed)
 
