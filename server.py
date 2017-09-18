@@ -69,11 +69,15 @@ def handleFire(x, y):
     respdict["x"] = x
     respdict["y"] = y
 
+    print("fire recieved at", x,type(x), y, type(y))
+    print(y,"is less than 0", y < 0)
+
     global ownBoard
     global shipStatus
 
     # 404 if the coordinates cannot be found
     if x < 0 or x >= len(ownBoard) or y < 0 or y >= len(ownBoard[x]):
+        print("Invalid coords")
         respdict["status_code"] = 404 # Not Found
         return respdict
 
