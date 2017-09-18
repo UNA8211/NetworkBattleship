@@ -1,7 +1,7 @@
 from collections import defaultdict
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from re import sub
-from urllib.parse import urlparse
+from urllib.parse import urlencode, urlparse
 import sys
 
 port = None
@@ -24,9 +24,10 @@ class BattleshipRequestHandler(BaseHTTPRequestHandler):
         contentLen = int(self.headers.get('content-length', 0))
         content = self.rfile.read(contentLen)
 
-        # parse the URL for the path and put the values in a map
-        path = sub("'","",str(urlparse(content).path))
-        pathdict = parsePath(path)
+        # parse the URL for the path.
+        # sanitize it
+        # put the values in a map
+        pathdict = parsePath(sub("b","",sub("'","",str(urlparse(content).path))))
 
         # determine what kind of request it is,
         #   fire (len = 2) or result (len > 2)
@@ -34,7 +35,7 @@ class BattleshipRequestHandler(BaseHTTPRequestHandler):
             respdict = handleFire(pathdict["x"], pathdict["y"])
 
             # package up and send the response
-            self.send_response(respdict["status_code"])
+            sendResponse(self, respdict)
         elif len(pathdict) > 2:
             self.send_response(200)
             handleResult(pathdict["x"], pathdict["y"], pathdict["hit"], pathdict["sink"])
@@ -44,6 +45,15 @@ class BattleshipRequestHandler(BaseHTTPRequestHandler):
             print("ERROR: Invalid URL path recieved: " + pathdict.items())
             self.send_response(400)
 
+
+def sendResponse(self, respdict):
+    self.send_response(int(respdict["status_code"]))
+    self.send_header("Content-type", "text/plain")
+    self.end_headers()
+
+    del respdict["status_code"]
+    self.wfile.write(urlencode(respdict).encode("utf-8"))
+    #self.wfile.close()
 
 # takes in a URL path (var1=int_val&var2=int_val...)
 #   and breaks up the entries into key:value pairings
@@ -65,19 +75,16 @@ def parsePath(path):
 #   and assesses the result of the shot. This result is written to the Message.
 def handleFire(x, y):
     # keep track of the response information to return
-    respdict = defaultdict(int)
+    respdict = defaultdict(str)
     respdict["x"] = x
     respdict["y"] = y
-
-    print("fire recieved at", x,type(x), y, type(y))
-    print(y,"is less than 0", y < 0)
+    respdict["hit"] = 0
 
     global ownBoard
     global shipStatus
 
     # 404 if the coordinates cannot be found
     if x < 0 or x >= len(ownBoard) or y < 0 or y >= len(ownBoard[x]):
-        print("Invalid coords")
         respdict["status_code"] = 404 # Not Found
         return respdict
 
@@ -94,7 +101,7 @@ def handleFire(x, y):
 
         # check if the ship has been sunk
         if shipStatus[ownBoard[x][y]] == 0:
-            respdict["sink"] = 1
+            respdict["sink"] = ownBoard[x][y]
 
     # mark the position as having been fired at
     ownBoard[x][y] = "X"
@@ -182,6 +189,7 @@ def printBoard(board):
         for y in range(len(board[x])):
             print(board[x][y], end="")
         print()
+    print()
 
 # run sets up the desired server and runs it
 def run(server_class=HTTPServer, handler_class=BattleshipRequestHandler):
@@ -210,6 +218,11 @@ def main():
 
     # read in the player's board
     readBoard("own")
+    shipStatus["C"] = 5
+    shipStatus["B"] = 4
+    shipStatus["R"] = 3
+    shipStatus["S"] = 3
+    shipStatus["D"] = 2
 
     # TODO read in the opponent's board (if a game is being resumed)
 

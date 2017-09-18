@@ -1,5 +1,5 @@
 #!/usr/bin/python
-import sys, re, http.client, urllib.parse, urllib.parse, requests
+import sys, re, http.client, requests
 
 def main():
     args = sys.argv[1:]
@@ -20,7 +20,6 @@ def fire(ip, port, x, y):
     parameters = {"x" : x, "y" : y}
 
     r = requests.post("http://" + ip + ":" + port, data=parameters, timeout=30)
-    r.status_code
 
     def update(response):
         #TODO: add the response as data to send to own server
