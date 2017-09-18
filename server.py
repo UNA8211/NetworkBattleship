@@ -32,20 +32,20 @@ class BattleshipRequestHandler(BaseHTTPRequestHandler):
         # determine what kind of request it is,
         #   fire (len = 2) or result (len > 2)
         if len(pathdict) == 2:
-            respdict = handleFire(pathdict["x"], pathdict["y"])
+            respdict = handleFire(int(pathdict["x"]), int(pathdict["y"]))
 
             # package up and send the response
             sendResponse(self, respdict)
         elif len(pathdict) > 2:
             self.send_response(200)
-            handleResult(pathdict["x"], pathdict["y"], pathdict["hit"], pathdict["sink"])
+            handleResult(int(pathdict["x"]), int(pathdict["y"]), int(pathdict["hit"]), pathdict["sink"])
         else:
             # do not raise exception,
             #   as an invalid fire command is expected behavior
             print("ERROR: Invalid URL path recieved: " + pathdict.items())
             self.send_response(400)
 
-
+# sendResponse forms and sends an HTTP response
 def sendResponse(self, respdict):
     self.send_response(int(respdict["status_code"]))
     self.send_header("Content-type", "text/plain")
@@ -59,7 +59,7 @@ def sendResponse(self, respdict):
 #   and breaks up the entries into key:value pairings
 def parsePath(path):
     # where the path info will be stored and returned
-    pathdict = defaultdict(int)
+    pathdict = defaultdict(str)
 
     # find each of the fields in the URL path
     pathArr = path.split("&")
@@ -67,7 +67,7 @@ def parsePath(path):
         # separate the field and its respective value,
         #   and add the pair to the dict
         fvArr = fvpair.split("=")
-        pathdict[fvArr[0]] = int(fvArr[1])
+        pathdict[fvArr[0]] = fvArr[1]
 
     return pathdict
 
@@ -139,9 +139,6 @@ def readBoard(boardName):
         b = oppBoard
     else:
         raise Exception("Expected \"own\" or \"opp\" as arg. Got " + board)
-
-    # TODO check if file exists. If not, error (own) or initialize file (opp)
-
 
     # open the file and populate the board
     with open(f, 'r') as boardFile:
