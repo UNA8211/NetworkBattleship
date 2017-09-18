@@ -117,7 +117,7 @@ def handleResult(x, y, hit, sink):
 
     # determine what mark should be placed on the board
     mark = "M"
-    if sink > 0:
+    if sink is not None:
         mark = "S"
     elif hit > 0:
         mark = "H"
