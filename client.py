@@ -20,17 +20,29 @@ def fire(ip, port, x, y):
     parameters = {"x" : x, "y" : y}
 
     resp = requests.post("http://" + ip + ":" + port, data=parameters, timeout=30)
-    print(resp.status_code)
+    response = resp.text
 
+    # sendResult takes the opponent's response to the fire POST request and
+    #   creates the result POST request to the player's own server
     def sendResult():
-        #TODO: add the response as data to send to own server
-        r = requests.post("http://localhost:5000", data=resp.text, timeout=30)
-        print(r.status_code)
-        if r.status_code != 200:
-            print("ERROR: your server could not be updated with the results of the shot.")
+        r = requests.post("http://localhost:5000", data=response, timeout=30)
 
-    if resp.status_code == 200:
-        sendResult()
+    # if the shot was invalid, inform the client
+    if resp.status_code != 200:
+        print(resp.status_code, end=": ")
+
+        if resp.status_code == 410:
+            print("location (" + str(x) + "," + str(y) + ") has already recieved fire.")
+        elif resp.status_code == 404:
+            print("invalid coordinates entered.")
+        elif resp.status_code == 400:
+            print("invalid fire command attempted.")
+    # if the shot was valid, ferry the result
+    else:
+        try:
+            sendResult()
+        except:
+            return
 
 IP_PATTERN = "\d{3}\.\d{3}\.\d(\d{1,2})?\.\d(\d{1,2})?"
 PORT_PATTERN = "^\d{1,4}"
