@@ -98,7 +98,7 @@ def handleFire(x, y):
 
     # mark the position as having been fired at
     ownBoard[x][y] = "X"
-    #writeBoard("own")
+    # writeBoard("own") # comment this out to disable persisting
 
     # return what will be the contents of the response message
     return respdict
@@ -106,8 +106,17 @@ def handleFire(x, y):
 # logResult takes a set of coords (location of player's shot)
 #   and logs the result of that shot as described by the other server
 def handleResult(x, y, hit, sink):
+    global oppBoard
 
-    return "must log hit, miss, sink"
+    # determine what mark should be placed on the board
+    mark = "M"
+    if sink > 0:
+        mark = "S"
+    elif hit > 0:
+        mark = "H"
+
+    oppBoard[x][y] = mark
+    # writeBoard("opp") # comment this out to disable persisting
 
 # readBoard takes a file representing a board
 #   and reads it into the given 10 x 10 matrix
