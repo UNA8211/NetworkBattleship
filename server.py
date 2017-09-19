@@ -39,7 +39,7 @@ class BattleshipRequestHandler(BaseHTTPRequestHandler):
         self.send_header("Content-type", "text/html")
         self.end_headers()
         self.wfile.write(body)
-        
+
     # handles opponent fire requests and player result requests
     def do_POST(self):
         # determine the request's length and extract the content
@@ -139,7 +139,7 @@ def handleResult(x, y, hit, sink):
 
     # determine what mark should be placed on the board
     mark = "M"
-    if sink is not None:
+    if sink is not "":
         mark = "S"
     elif hit > 0:
         mark = "H"
@@ -208,7 +208,7 @@ def writeBoardToHTML(board):
     # Reset sysout to original
 
     return html_board
-    
+
 # printBoard takes in the board to print and prints it
 def printBoard(board):
     html_board = ""
