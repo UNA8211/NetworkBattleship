@@ -2,23 +2,20 @@
 import sys, re, http.client, requests
 
 def main():
+    # Get command line arguments
     args = sys.argv[1:]
+    # Make sure we have the correct number of arguments
     if len(args) != 4:
         print ("ERROR: Invalid number of arguments")
         return 1
 
-    ip = args[0]
-
-    port = re.match(PORT_PATTERN, args[1], flags=0)
-    if port is None:
-        print ("ERROR: Invalid port")
-        return 1
-
-    fire(ip, port.group(), args[2], args[3])
+    fire(args[0], args[1], args[2], args[3])
 
 def fire(ip, port, x, y):
+    # Convert to a dict
     parameters = {"x" : x, "y" : y}
 
+    # Make a POST request to the server
     resp = requests.post("http://" + ip + ":" + port, data=parameters, timeout=30)
     response = resp.text
 
@@ -43,11 +40,6 @@ def fire(ip, port, x, y):
             sendResult()
         except:
             return
-
-IP_PATTERN = "\d{3}\.\d{3}\.\d(\d{1,2})?\.\d(\d{1,2})?"
-PORT_PATTERN = "^\d{1,4}"
-COORDINATE_PATTERN = "\d \d"
-
 
 if __name__ == "__main__":
     main()
