@@ -18,6 +18,28 @@ oppFile = "opp-board.txt" # default opposing file name
 
 # BattleshipRequestHandler is an extension of BaseHTTPRequestHandler
 class BattleshipRequestHandler(BaseHTTPRequestHandler):
+    def do_GET(self):
+
+        #Set response variables premptively
+        url_path = self.path
+        response = 200
+        body = bytes("", "utf-8")
+
+        # Check if the path matches any of the accepted files
+        if url_path == "/own_board.html":
+            body = bytes(writeBoardToHTML(ownBoard), "utf-8")
+        elif url_path == "/opponent_board.html":
+            body = bytes(writeBoardToHTML(oppBoard), "utf-8")
+        else:
+            response = 404
+            body = bytes("<html> <head> </head> <body> <h1> 404 - FILE NOT FOUND </h1> </body> </html>", "utf-8")
+
+        # Send HTTP response
+        self.send_response(response)
+        self.send_header("Content-type", "text/html")
+        self.end_headers()
+        self.wfile.write(body)
+        
     # handles opponent fire requests and player result requests
     def do_POST(self):
         # determine the request's length and extract the content
@@ -177,16 +199,24 @@ def writeBoard(boardName):
     #writeBoardToHTML(b, f)
 
 # writeBoardToHTML writes the given board
-def writeBoardToHTML(board, txtfilename):
-    raise Exception("Don't use me. I don't do anything yet.")
+def writeBoardToHTML(board):
+    # Print board to HTML
+    html_board = "<html> <head> </head> <body> <pre>"
+    html_board += printBoard(board)
+    html_board += "</pre> </body> </html>"
 
+    # Reset sysout to original
+
+    return html_board
+    
 # printBoard takes in the board to print and prints it
 def printBoard(board):
+    html_board = ""
     for x in range(len(board)):
         for y in range(len(board[x])):
-            print(board[x][y], end="")
-        print()
-    print()
+            html_board += str((board[x][y]) + " ")
+        html_board += "\n"
+    return html_board
 
 # run sets up the desired server and runs it
 def run(server_class=HTTPServer, handler_class=BattleshipRequestHandler):
