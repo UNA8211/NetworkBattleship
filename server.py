@@ -200,9 +200,8 @@ def writeBoard(boardName):
 
 # writeBoardToHTML writes the given board
 def writeBoardToHTML(board):
-    html_board = ""
     # Print board to HTML
-    html_board += "<html> <head> </head> <body> <pre>"
+    html_board = "<html> <head> </head> <body> <pre>"
     html_board += printBoard(board)
     html_board += "</pre> </body> </html>"
 
