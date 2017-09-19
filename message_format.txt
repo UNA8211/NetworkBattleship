@@ -1,0 +1,8 @@
+The data for our messages are formatted as URL encoded strings.
+This means that a FIELD/VALUE pairing will be encoded as field=value,
+  with ampersands separating multiple pairings.
+For example, a command line argument giving 5 and 5 as the fire coordinates
+  would be sent across the wire as "x=5&y=5".
+If such a fire resulted in a hit, the server would respond with "x=5&y=5&hit=1".
+If the hit led to the sinking of a destroyer, the server would respond with
+  "x=5&y=5&hit=1&sink=1".
